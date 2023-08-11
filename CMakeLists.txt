@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.0)
+project(dynamic_array C)
+set(CMAKE_C_STANDARD 99)
+
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
+set(PROJECT_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/src/")
+
+add_library(${PROJECT_NAME} STATIC)
+target_sources(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_INCLUDE})
