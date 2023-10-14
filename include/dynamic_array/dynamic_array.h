@@ -1,3 +1,6 @@
+#ifndef DYNAMIC_ARRAY_H
+#define DYNAMIC_ARRAY_H
+
 #include <blog/blog.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -27,7 +30,7 @@ dynamic_array* dynamic_array_create(size_t stride) {
 
 void* dynamic_array_get(dynamic_array* dynamic_array, int index) {
   if (index >= dynamic_array->length) {
-    blog_log("Index Out Of Bounds! | dynamic_array_get()\n");
+    BLOG_LOG("Index out of bounds!", ERROR);
     exit(1);
   }
   return dynamic_array->array + index * dynamic_array->stride;
@@ -35,7 +38,7 @@ void* dynamic_array_get(dynamic_array* dynamic_array, int index) {
 
 void dynamic_array_set(dynamic_array* dynamic_array, int index, void* value) {
   if (index >= dynamic_array->length) {
-    blog_log("Index Out Of Bounds! | dynamic_array_set()\n");
+    BLOG_LOG("Index out of bounds!", ERROR);
     exit(1);
   }
   memcpy(dynamic_array->array + (index * dynamic_array->stride), value, dynamic_array->stride);
@@ -63,7 +66,7 @@ void dynamic_array_destroy(dynamic_array* dynamic_array) {
 
 void dynamic_array_remove(dynamic_array* dynamic_array, int index) {
   if (index >= dynamic_array->length) {
-    blog_log("Index Out Of Bounds! | dynamic_array_remove()\n");
+    BLOG_LOG("Index out of bounds!", ERROR);
     exit(1);
   }
 
@@ -77,3 +80,5 @@ void dynamic_array_remove(dynamic_array* dynamic_array, int index) {
 
   dynamic_array->length--;
 }
+
+#endif
