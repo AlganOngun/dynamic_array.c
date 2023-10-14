@@ -1,18 +1,18 @@
-#include "dynamic_array.h"
-
+#include <blog/blog.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct dynamic_array {
+#define DYNAMIC_ARRAY_CREATE(type) dynamic_array_create(sizeof(type))
+
+typedef struct dynamic_array {
   size_t allocated;
   size_t length;
   size_t stride;
   void* array;
-};
+} dynamic_array;
 
-dynamic_array* _dynamic_array_create(size_t stride) {
+dynamic_array* dynamic_array_create(size_t stride) {
   void* array = malloc(stride * 4);
 
   dynamic_array* dynamic_array = malloc(3 * sizeof(size_t) + stride * 4);
@@ -27,7 +27,7 @@ dynamic_array* _dynamic_array_create(size_t stride) {
 
 void* dynamic_array_get(dynamic_array* dynamic_array, int index) {
   if (index >= dynamic_array->length) {
-    perror("Index Out Of Bounds! | dynamic_array_get()\n");
+    blog_log("Index Out Of Bounds! | dynamic_array_get()\n");
     exit(1);
   }
   return dynamic_array->array + index * dynamic_array->stride;
@@ -35,7 +35,7 @@ void* dynamic_array_get(dynamic_array* dynamic_array, int index) {
 
 void dynamic_array_set(dynamic_array* dynamic_array, int index, void* value) {
   if (index >= dynamic_array->length) {
-    perror("Index Out Of Bounds! | dynamic_array_set()\n");
+    blog_log("Index Out Of Bounds! | dynamic_array_set()\n");
     exit(1);
   }
   memcpy(dynamic_array->array + (index * dynamic_array->stride), value, dynamic_array->stride);
@@ -63,7 +63,7 @@ void dynamic_array_destroy(dynamic_array* dynamic_array) {
 
 void dynamic_array_remove(dynamic_array* dynamic_array, int index) {
   if (index >= dynamic_array->length) {
-    perror("Index Out Of Bounds! | dynamic_array_remove()\n");
+    blog_log("Index Out Of Bounds! | dynamic_array_remove()\n");
     exit(1);
   }
 
