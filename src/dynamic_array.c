@@ -5,27 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "buffers.h"
-
 struct dynamic_array {
   size_t allocated;
   size_t length;
   size_t stride;
-  enum BUFFER_TYPE buffer_type;
   void* array;
 };
 
 dynamic_array* _dynamic_array_create(size_t stride) {
-  if (buffer_32->capacity == 0) buffer_32 = buffer_allocate(32);
-  void* array = buffer_reserve(buffer_32, stride * 4);
+  void* array = malloc(stride * 4);
 
-  dynamic_array* dynamic_array = malloc(sizeof(size_t) * 3 + sizeof(enum BUFFER_TYPE));
+  dynamic_array* dynamic_array = malloc(3 * sizeof(size_t) + stride * 4);
 
   dynamic_array->array = array;
   dynamic_array->allocated = 4;
   dynamic_array->length = 0;
   dynamic_array->stride = stride;
-  dynamic_array->buffer_type = BUFFER_32;
 
   return dynamic_array;
 }
@@ -35,7 +30,7 @@ void* dynamic_array_get(dynamic_array* dynamic_array, int index) {
     perror("Index Out Of Bounds! | dynamic_array_get()\n");
     exit(1);
   }
-  return dynamic_array->array + (index * dynamic_array->stride);
+  return dynamic_array->array + index * dynamic_array->stride;
 }
 
 void dynamic_array_set(dynamic_array* dynamic_array, int index, void* value) {
@@ -48,25 +43,13 @@ void dynamic_array_set(dynamic_array* dynamic_array, int index, void* value) {
 
 void dynamic_array_push(dynamic_array* dynamic_array, void* element) {
   if (dynamic_array->length >= dynamic_array->allocated) {
-    void* temp = dynamic_array->array;
+    void* old = dynamic_array->array;
+    dynamic_array->array = malloc(dynamic_array->allocated * dynamic_array->stride);
 
-    if (dynamic_array->buffer_type == BUFFER_32) {
-      if (buffer_64->capacity == 0) buffer_64 = buffer_allocate(64);
-      dynamic_array->array = buffer_reserve(buffer_64, dynamic_array->stride * 8);
-      memcpy(dynamic_array->array, temp, dynamic_array->allocated * dynamic_array->stride);
-      buffer_clear(temp, dynamic_array->stride * dynamic_array->length);
+    memcpy(dynamic_array->array, old, dynamic_array->allocated * dynamic_array->stride);
 
-      dynamic_array->buffer_type = BUFFER_64;
-      dynamic_array->allocated = 8;
-    } else if (dynamic_array->buffer_type == BUFFER_64) {
-      if (buffer_128->capacity == 0) buffer_128 = buffer_allocate(128);
-      dynamic_array->array = buffer_reserve(buffer_128, dynamic_array->stride * 16);
-      memcpy(dynamic_array->array, temp, dynamic_array->allocated * dynamic_array->stride);
-      buffer_clear(temp, dynamic_array->stride * dynamic_array->length);
-
-      dynamic_array->buffer_type = BUFFER_128;
-      dynamic_array->allocated = 16;
-    }
+    free(old);
+    dynamic_array->allocated *= 2;
   }
 
   dynamic_array->length++;
@@ -74,8 +57,7 @@ void dynamic_array_push(dynamic_array* dynamic_array, void* element) {
 }
 
 void dynamic_array_destroy(dynamic_array* dynamic_array) {
-  buffer_clear(dynamic_array->array, dynamic_array->allocated);
-
+  free(dynamic_array->array);
   free(dynamic_array);
 }
 
